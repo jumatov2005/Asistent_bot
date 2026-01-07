@@ -14,9 +14,9 @@ if not os.path.exists("logs"):
 
 async def main():
     """
-    Botni ishga tushirish (Final Production Version)
+    Botni ishga tushirish (Final Production Version with PostgreSQL)
     """
-    # Logging Configuration (File + Console)
+    # Logging Configuration
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -29,10 +29,10 @@ async def main():
     logger = logging.getLogger(__name__)
     logger.info("Bot starting up...")
 
-    # DB Connection Check
+    # DB Connection (AsyncPG Pool)
     try:
-        db.create_tables()
-        logger.info("Database connection and tables checked.")
+        await db.create()
+        logger.info("Database connection pool established.")
     except Exception as e:
         logger.critical(f"Database Initialization Failed: {e}")
         return
@@ -52,7 +52,7 @@ async def main():
     dp.include_router(super_admin.router)
     logger.info("Routers included.")
 
-    # Global Error Handler (Simple)
+    # Global Error Handler
     @dp.error()
     async def global_error_handler(event: types.ErrorEvent):
         logger.error(f"Critical Error in Update {event.update}: {event.exception}", exc_info=True)
@@ -63,14 +63,13 @@ async def main():
     
     logger.info("Bot polling started!")
     try:
-        # Resolve updates conflict by dropping pending (already checked above)
-        # allowed_updates=None -> all updates
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
     except Exception as e:
         logger.critical(f"Polling crashed: {e}")
     finally:
+        await db.close()
         await bot.session.close()
-        logger.info("Bot session closed.")
+        logger.info("Bot session and DB pool closed.")
 
 if __name__ == "__main__":
     try:

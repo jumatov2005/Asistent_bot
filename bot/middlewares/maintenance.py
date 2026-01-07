@@ -12,10 +12,10 @@ class MaintenanceMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         
-        # Check maintenance efficiently
-        if db.is_maintenance_mode():
+        # Check maintenance efficiently (Async)
+        if await db.is_maintenance_mode():
             user_id = event.from_user.id
-            user = db.get_user(user_id)
+            user = await db.get_user(user_id)
             
             # Agar user bo'lmasa yoki super admin bo'lmasa -> bloklanadi
             if not user or user["role"] != "super_admin":

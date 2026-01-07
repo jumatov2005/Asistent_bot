@@ -1,15 +1,8 @@
 import os
-from dotenv import load_dotenv
 
-# .env faylni yuklash
-load_dotenv()
+# Railway va lokal uchun universal konfiguratsiya
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+SUPER_ADMIN = int(os.environ.get("SUPER_ADMIN", 0))
 
-# Bot tokenini olish
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-# Super admin ID sini olish (int ga o'tkazish)
-try:
-    SUPER_ADMIN_ID = int(os.getenv("SUPER_ADMIN_ID"))
-except (TypeError, ValueError):
-    # Agar .env da xato bo'lsa yoki yo'q bo'lsa, xatolik chiqmasligi uchun 0 qo'yamiz
-    SUPER_ADMIN_ID = 0
+if not BOT_TOKEN:
+    raise RuntimeError("BOT_TOKEN environment variable is not set!")

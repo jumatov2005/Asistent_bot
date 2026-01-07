@@ -6,7 +6,7 @@ from states.states import RegisterState
 from keyboards.inline import language_choice_kb
 from keyboards.reply import main_user_kb, main_admin_kb
 from texts import TEXTS
-from config import SUPER_ADMIN_ID
+from config import SUPER_ADMIN
 
 router = Router()
 
@@ -26,7 +26,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         role = user["role"]
         
         # Super admin check sync
-        if user_id == SUPER_ADMIN_ID and role != "super_admin":
+        if user_id == SUPER_ADMIN and role != "super_admin":
             db.update_user_role(user_id, "super_admin")
             role = "super_admin"
 
@@ -58,7 +58,7 @@ async def register_language(callback: types.CallbackQuery, state: FSMContext):
         first_name = callback.from_user.first_name
         
         role = "user"
-        if user_id == SUPER_ADMIN_ID:
+        if user_id == SUPER_ADMIN:
             role = "super_admin"
             
         db.add_user(user_id, first_name, username, lang_code, role)
